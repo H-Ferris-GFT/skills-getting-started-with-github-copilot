@@ -26,55 +26,64 @@ activities = {
         "description": "Learn strategies and compete in chess tournaments",
         "schedule": "Fridays, 3:30 PM - 5:00 PM",
         "max_participants": 12,
-        "participants": ["michael@mergington.edu", "daniel@mergington.edu"]
+        "participants": ["michael@mergington.edu", "daniel@mergington.edu"],
+        "category": "intellectual"
     },
     "Programming Class": {
         "description": "Learn programming fundamentals and build software projects",
         "schedule": "Tuesdays and Thursdays, 3:30 PM - 4:30 PM",
         "max_participants": 20,
-        "participants": ["emma@mergington.edu", "sophia@mergington.edu"]
+        "participants": ["emma@mergington.edu", "sophia@mergington.edu"],
+        "category": "intellectual"
     },
     "Gym Class": {
         "description": "Physical education and sports activities",
         "schedule": "Mondays, Wednesdays, Fridays, 2:00 PM - 3:00 PM",
         "max_participants": 30,
-        "participants": ["john@mergington.edu", "olivia@mergington.edu"]
+        "participants": ["john@mergington.edu", "olivia@mergington.edu"],
+        "category": "sports"
     },
     "Soccer Team": {
         "description": "Practice teamwork and improve your ball control in weekly matches",
         "schedule": "Wednesdays, 4:00 PM - 5:30 PM",
         "max_participants": 18,
-        "participants": ["lucas@mergington.edu"]
+        "participants": ["lucas@mergington.edu"],
+        "category": "sports"
     },
     "Basketball Club": {
         "description": "Develop shooting, defense, and game strategy skills",
         "schedule": "Mondays and Thursdays, 3:30 PM - 5:00 PM",
         "max_participants": 16,
-        "participants": ["ava@mergington.edu"]
+        "participants": ["ava@mergington.edu"],
+        "category": "sports"
     },
     "Drama Club": {
         "description": "Explore acting, improvisation, and stage performance",
         "schedule": "Tuesdays, 3:45 PM - 5:00 PM",
         "max_participants": 15,
-        "participants": ["zoe@mergington.edu"]
+        "participants": ["zoe@mergington.edu"],
+        "category": "artistic"
     },
     "Art Workshop": {
         "description": "Create drawings, paintings, and mixed media projects",
         "schedule": "Thursdays, 3:30 PM - 5:00 PM",
         "max_participants": 14,
-        "participants": ["mia@mergington.edu"]
+        "participants": ["mia@mergington.edu"],
+        "category": "artistic"
     },
     "Math Olympiad": {
         "description": "Solve challenging problems and prepare for math competitions",
         "schedule": "Fridays, 3:30 PM - 5:00 PM",
         "max_participants": 12,
-        "participants": ["noah@mergington.edu"]
+        "participants": ["noah@mergington.edu"],
+        "category": "intellectual"
     },
     "Science Club": {
         "description": "Conduct experiments and explore scientific concepts in depth",
         "schedule": "Wednesdays, 3:30 PM - 4:45 PM",
         "max_participants": 20,
-        "participants": ["isabella@mergington.edu"]
+        "participants": ["isabella@mergington.edu"],
+        "category": "intellectual"
     }
 }
 
@@ -110,6 +119,24 @@ def signup_for_activity(activity_name: str, email: str):
 
     activity["participants"].append(normalized_email)
     return {"message": f"Signed up {normalized_email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/unregister")
+def unregister_from_activity(activity_name: str, email: str):
+    """Remove a student from an activity"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    normalized_email = email.strip().lower()
+    if not normalized_email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    activity = activities[activity_name]
+    if normalized_email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Student is not registered for this activity")
+
+    activity["participants"] = [participant for participant in activity["participants"] if participant != normalized_email]
+    return {"message": f"Unregistered {normalized_email} from {activity_name}"}
 
 
 if __name__ == "__main__":
